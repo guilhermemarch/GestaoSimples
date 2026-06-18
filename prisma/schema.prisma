@@ -9,43 +9,199 @@ datasource db {
 
 enum Role {
   ADMIN
+  MANAGER
   OPERATOR
 }
 
+enum PaymentMethod {
+  CASH
+  PIX
+  DEBIT_CARD
+  CREDIT_CARD
+  PENDING
+}
+
+enum SaleStatus {
+  CONFIRMED
+  QUOTE
+  CANCELLED
+}
+
+enum CashSessionStatus {
+  OPEN
+  CLOSED
+}
+
+enum CashMovementType {
+  SALE
+  REINFORCEMENT
+  WITHDRAWAL
+  EXPENSE
+}
+
+enum ReceivableStatus {
+  OPEN
+  OVERDUE
+  PARTIAL
+  PAID
+}
+
+enum ExpenseStatus {
+  PENDING
+  PAID
+}
+
+enum ExpenseCategory {
+  RENT
+  ENERGY
+  INTERNET
+  SALARY
+  SUPPLIER
+  MAINTENANCE
+  TAX
+  OTHER
+}
+
+enum ServiceOrderStatus {
+  QUOTE
+  APPROVED
+  IN_PROGRESS
+  WAITING_PARTS
+  COMPLETED
+  DELIVERED
+  CANCELLED
+}
+
+enum StockMovementType {
+  SALE
+  ADJUSTMENT
+  PURCHASE
+}
+
+model Company {
+  id                  String        @id @default(cuid())
+  name                String
+  tradeName           String?
+  document            String?
+  phone               String?
+  address             String?
+  addressStreet       String?
+  addressNeighborhood String?
+  addressCity         String?
+  addressState        String?
+  addressZip          String?
+  segment             String?
+  planName            String?       @default("Profissional")
+  maxUsers            Int           @default(5)
+  settingsJson        String?
+  createdAt           DateTime      @default(now())
+  users        User[]
+  customers    Customer[]
+  products     Product[]
+  sales        Sale[]
+  expenses     Expense[]
+  cashSessions  CashSession[]
+  receivables   Receivable[]
+  serviceOrders ServiceOrder[]
+}
+
 model User {
-  id           String   @id @default(cuid())
-  email        String   @unique
-  passwordHash String
-  name         String
-  role         Role     @default(OPERATOR)
-  createdAt    DateTime @default(now())
+  id                 String        @id @default(cuid())
+  email              String        @unique
+  passwordHash       String
+  name               String
+  role               Role          @default(OPERATOR)
+  companyId          String
+  company            Company       @relation(fields: [companyId], references: [id])
+  createdAt          DateTime      @default(now())
+  openedCashSessions CashSession[] @relation("OpenedBy")
+  cancelledSales          Sale[]                    @relation("CancelledBy")
+  serviceOrderHistory     ServiceOrderStatusHistory[]
 }
 
 model Customer {
-  id        String   @id @default(cuid())
-  name      String
-  phone     String?
-  email     String?
-  createdAt DateTime @default(now())
-  sales     Sale[]
+  id          String       @id @default(cuid())
+  companyId   String
+  company     Company      @relation(fields: [companyId], references: [id])
+  name        String
+  phone       String?
+  email       String?
+  document    String?
+  address     String?
+  notes        String?
+  category     String?
+  creditLimit  Float?
+  active       Boolean      @default(true)
+  createdAt   DateTime     @default(now())
+  sales         Sale[]
+  receivables   Receivable[]
+  serviceOrders ServiceOrder[]
 }
 
 model Product {
   id        String     @id @default(cuid())
+  companyId String
+  company   Company    @relation(fields: [companyId], references: [id])
   name      String
+  sku       String?
   price     Float
+  cost      Float?
   stock     Int
+  minStock  Int        @default(5)
+  category  String?
+  supplier  String?
+  imageUrl  String?
+  active    Boolean    @default(true)
   createdAt DateTime   @default(now())
-  saleItems SaleItem[]
+  saleItems         SaleItem[]
+  serviceOrderItems ServiceOrderItem[]
+  stockMovements    StockMovement[]
+}
+
+model StockMovement {
+  id           String            @id @default(cuid())
+  productId    String
+  product      Product           @relation(fields: [productId], references: [id], onDelete: Cascade)
+  type         StockMovementType
+  quantity     Int
+  balanceAfter Int
+  description  String?
+  createdAt    DateTime          @default(now())
 }
 
 model Sale {
-  id         String     @id @default(cuid())
-  customerId String
-  customer   Customer   @relation(fields: [customerId], references: [id])
-  total      Float
-  createdAt  DateTime   @default(now())
-  items      SaleItem[]
+  id              String         @id @default(cuid())
+  companyId       String
+  company         Company        @relation(fields: [companyId], references: [id])
+  customerId      String
+  customer        Customer       @relation(fields: [customerId], references: [id])
+  total           Float
+  discount        Float          @default(0)
+  notes           String?
+  status          SaleStatus     @default(CONFIRMED)
+  paymentMethod   PaymentMethod  @default(CASH)
+  amountReceived  Float?
+  changeAmount    Float?
+  cashSessionId   String?
+  cashSession     CashSession?   @relation(fields: [cashSessionId], references: [id])
+  cancelReason    String?
+  cancelledAt     DateTime?
+  cancelledById   String?
+  cancelledBy     User?          @relation("CancelledBy", fields: [cancelledById], references: [id])
+  createdAt       DateTime       @default(now())
+  items           SaleItem[]
+  payments        SalePayment[]
+  receivable      Receivable?
+  cashMovements   CashMovement[]
+  serviceOrder    ServiceOrder?
+}
+
+model SalePayment {
+  id     String        @id @default(cuid())
+  saleId String
+  sale   Sale          @relation(fields: [saleId], references: [id], onDelete: Cascade)
+  method PaymentMethod
+  amount Float
 }
 
 model SaleItem {
@@ -57,4 +213,118 @@ model SaleItem {
   quantity  Int
   unitPrice Float
   subtotal  Float
+}
+
+model CashSession {
+  id             String            @id @default(cuid())
+  companyId      String
+  company        Company           @relation(fields: [companyId], references: [id])
+  openedById     String
+  openedBy       User              @relation("OpenedBy", fields: [openedById], references: [id])
+  openingAmount  Float             @default(0)
+  closingAmount  Float?
+  expectedAmount Float?
+  difference     Float?
+  justification  String?
+  status         CashSessionStatus @default(OPEN)
+  openedAt       DateTime          @default(now())
+  closedAt       DateTime?
+  sales          Sale[]
+  movements      CashMovement[]
+}
+
+model CashMovement {
+  id          String           @id @default(cuid())
+  sessionId   String
+  session     CashSession      @relation(fields: [sessionId], references: [id])
+  type        CashMovementType
+  amount      Float
+  description String?
+  saleId      String?
+  sale        Sale?            @relation(fields: [saleId], references: [id])
+  createdAt   DateTime         @default(now())
+}
+
+model Receivable {
+  id          String             @id @default(cuid())
+  companyId   String
+  company     Company            @relation(fields: [companyId], references: [id])
+  customerId  String
+  customer    Customer           @relation(fields: [customerId], references: [id])
+  saleId      String?            @unique
+  sale        Sale?              @relation(fields: [saleId], references: [id])
+  description String
+  amount      Float
+  paidAmount  Float              @default(0)
+  dueDate     DateTime
+  status      ReceivableStatus   @default(OPEN)
+  createdAt   DateTime           @default(now())
+  payments    ReceivablePayment[]
+}
+
+model ReceivablePayment {
+  id           String     @id @default(cuid())
+  receivableId String
+  receivable   Receivable @relation(fields: [receivableId], references: [id], onDelete: Cascade)
+  amount       Float
+  paidAt       DateTime   @default(now())
+}
+
+model ServiceOrder {
+  id            String                      @id @default(cuid())
+  companyId     String
+  company       Company                     @relation(fields: [companyId], references: [id])
+  customerId    String
+  customer      Customer                    @relation(fields: [customerId], references: [id])
+  description   String
+  status        ServiceOrderStatus          @default(QUOTE)
+  laborCost     Float                       @default(0)
+  total         Float                       @default(0)
+  estimatedDate DateTime?
+  notes         String?
+  saleId        String?                     @unique
+  sale          Sale?                       @relation(fields: [saleId], references: [id])
+  createdAt     DateTime                    @default(now())
+  updatedAt     DateTime                    @updatedAt
+  items         ServiceOrderItem[]
+  history       ServiceOrderStatusHistory[]
+}
+
+model ServiceOrderItem {
+  id             String       @id @default(cuid())
+  serviceOrderId String
+  serviceOrder   ServiceOrder @relation(fields: [serviceOrderId], references: [id], onDelete: Cascade)
+  productId      String?
+  product        Product?     @relation(fields: [productId], references: [id])
+  description    String?
+  quantity       Int          @default(1)
+  unitPrice      Float
+  subtotal       Float
+}
+
+model ServiceOrderStatusHistory {
+  id             String              @id @default(cuid())
+  serviceOrderId String
+  serviceOrder   ServiceOrder        @relation(fields: [serviceOrderId], references: [id], onDelete: Cascade)
+  fromStatus     ServiceOrderStatus?
+  toStatus       ServiceOrderStatus
+  userId         String
+  user           User                @relation(fields: [userId], references: [id])
+  note           String?
+  createdAt      DateTime            @default(now())
+}
+
+model Expense {
+  id            String          @id @default(cuid())
+  companyId     String
+  company       Company         @relation(fields: [companyId], references: [id])
+  description   String
+  category      ExpenseCategory @default(OTHER)
+  amount        Float
+  date          DateTime
+  dueDate       DateTime?
+  paymentMethod PaymentMethod?
+  status        ExpenseStatus   @default(PENDING)
+  supplier      String?
+  createdAt     DateTime        @default(now())
 }
