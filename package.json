@@ -8,17 +8,30 @@
     "start": "next start",
     "lint": "next lint",
     "db:push": "prisma db push",
-    "db:seed": "tsx prisma/seed.ts",
+    "db:seed": "NODE_PATH=./node_modules tsx ../demo-seed/seed.ts",
+    "scrape:products": "node ../demo-seed/scrape-saoroque.mjs",
     "test": "vitest run",
     "postinstall": "prisma generate"
   },
   "dependencies": {
+    "@hookform/resolvers": "^5.4.0",
     "@prisma/client": "^6.9.0",
+    "@tanstack/react-table": "^8.21.3",
     "bcryptjs": "^3.0.2",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
     "jose": "^6.0.11",
+    "lucide-react": "^1.21.0",
     "next": "^15.3.3",
+    "next-themes": "^0.4.6",
+    "radix-ui": "^1.6.0",
     "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "react-dom": "^19.1.0",
+    "react-hook-form": "^7.80.0",
+    "recharts": "^3.8.1",
+    "sonner": "^2.0.7",
+    "tailwind-merge": "^3.6.0",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.8",
