@@ -1,1 +1,127 @@
 @import "tailwindcss";
+
+@theme inline {
+  /* Cores */
+  --color-background: #f7f8f6;
+  --color-foreground: #1f2933;
+  --color-card: #ffffff;
+  --color-card-foreground: #1f2933;
+  --color-popover: #ffffff;
+  --color-popover-foreground: #1f2933;
+  --color-primary: #16a34a;
+  --color-primary-foreground: #ffffff;
+  --color-primary-hover: #15803d;
+  --color-primary-soft: #dcfce7;
+  --color-secondary: #f1f5f3;
+  --color-secondary-foreground: #1f2933;
+  --color-muted: #f1f5f3;
+  --color-muted-foreground: #64748b;
+  --color-accent: #dcfce7;
+  --color-accent-foreground: #15803d;
+  --color-success: #16a34a;
+  --color-success-foreground: #ffffff;
+  --color-success-soft: #dcfce7;
+  --color-warning: #d97706;
+  --color-warning-foreground: #ffffff;
+  --color-warning-soft: #fef3c7;
+  --color-danger: #dc2626;
+  --color-danger-foreground: #ffffff;
+  --color-danger-soft: #fee2e2;
+  --color-info: #2563eb;
+  --color-info-foreground: #ffffff;
+  --color-info-soft: #dbeafe;
+  --color-destructive: #dc2626;
+  --color-destructive-foreground: #ffffff;
+  --color-border: #e5e7eb;
+  --color-input: #e5e7eb;
+  --color-ring: #16a34a;
+
+  /* Radius — escala enterprise mais contida */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 10px;
+
+  /* Sombras */
+  --shadow-card: 0 1px 2px 0 rgb(15 23 42 / 0.04);
+  --shadow-card-hover: 0 2px 8px -2px rgb(15 23 42 / 0.08);
+  --shadow-popover: 0 4px 16px -4px rgb(15 23 42 / 0.12);
+  --shadow-dialog: 0 12px 40px -12px rgb(15 23 42 / 0.22);
+
+  /* Breakpoint extra para onboarding stepper / telas estreitas */
+  --breakpoint-xs: 400px;
+
+  /* Container maximo de conteudo (centraliza em telas largas) */
+  --container-content: 1400px;
+}
+
+:root {
+  /* Alias usado por sonner / componentes que referenciam --radius */
+  --radius: 8px;
+
+  /* Layout */
+  --sidebar-w: 240px;
+  --topbar-h: 64px;
+  --space-page: 16px;
+  --space-page-lg: 24px;
+  --space-section: 20px;
+  --space-card: 16px;
+  --space-card-sm: 12px;
+
+  /* Charts / tabelas */
+  --chart-h: 260px;
+  --chart-h-sm: 200px;
+  --table-row-h: 40px;
+  --table-head-h: 36px;
+}
+
+* {
+  border-color: var(--color-border);
+}
+
+body {
+  background: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-inter), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+@layer utilities {
+  /* Centraliza o conteudo em telas largas */
+  .content-max {
+    width: 100%;
+    max-width: var(--container-content);
+    margin-inline: auto;
+  }
+
+  /* Ritmo vertical consistente entre blocos de uma pagina */
+  .page-stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-section);
+  }
+
+  /* Grid de secao generico: 1 / 2 / 4 colunas com gutters consistentes */
+  .section-grid {
+    display: grid;
+    gap: 0.75rem;
+    grid-template-columns: 1fr;
+  }
+  @media (min-width: 640px) {
+    .section-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (min-width: 1024px) {
+    .section-grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 1rem;
+    }
+  }
+
+  /* Garante que filhos de um flex/grid nunca estourem o pai */
+  .min-w-0-force {
+    min-width: 0;
+  }
+}
