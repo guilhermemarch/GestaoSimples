@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { compare } from "bcryptjs";
 import { prisma } from "@/lib/prisma";
-import { createSession } from "@/lib/auth";
+import { applySessionCookie, createSessionToken } from "@/lib/auth";
 
 export async function POST(request: Request) {
   const { email, password } = await request.json();
@@ -10,14 +10,25 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "E-mail e senha são obrigatórios" }, { status: 400 });
   }
 
-  const user = await prisma.user.findUnique({ where: { email } });
+  const user = await prisma.user.findUnique({
+    where: { email },
+    include: { company: true },
+  });
   if (!user || !(await compare(password, user.passwordHash))) {
     return NextResponse.json({ error: "E-mail ou senha incorretos" }, { status: 401 });
   }
 
-  await createSession(user.id);
-
-  return NextResponse.json({
-    user: { id: user.id, email: user.email, name: user.name, role: user.role },
+  const token = await createSessionToken(user.id);
+  const response = NextResponse.json({
+    user: {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      role: user.role,
+      companyId: user.companyId,
+      company: { id: user.company.id, name: user.company.name, tradeName: user.company.tradeName },
+    },
   });
+  applySessionCookie(response, token);
+  return response;
 }

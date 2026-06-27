@@ -1,10 +1,6 @@
 import { NextResponse } from "next/server";
-import { getSessionUser } from "@/lib/auth";
+import { withAuth } from "@/lib/api";
 
 export async function GET() {
-  const user = await getSessionUser();
-  if (!user) {
-    return NextResponse.json({ error: "Não autenticado" }, { status: 401 });
-  }
-  return NextResponse.json({ user });
+  return withAuth(async (user) => NextResponse.json({ user }));
 }
