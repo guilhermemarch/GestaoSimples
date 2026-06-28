@@ -2,49 +2,69 @@
 
 Contexto global do projeto para agentes de IA.
 
-## O que é este projeto
+## Demo
 
-**GestãoSimples** é um sistema de gestão para micro e pequenas empresas. Permite controlar clientes, produtos, vendas e visualizar um dashboard com resumo do negócio.
+- Login: `admin@gestao.com` / `admin123`
+- Operador: `operador@gestao.com` / `operador123`
+- Referências visuais: `docs/references/*.png` (versionadas no repositório)
 
-## Público
+## Catálogo de produtos (São Roque)
 
-Donos e funcionários de pequenos negócios (lojas, oficinas, prestadores de serviço) com até ~10 pessoas.
+30 produtos reais com fotos, preços e categorias:
 
-## Módulos do MVP
+```bash
+npm run scrape:products   # baixa JSON + imagens (fonte: supermercadosaoroque.com.br)
+npm run db:seed           # repovoa banco com catálogo scrapeado
+```
 
-1. **Autenticação** — login, logout, perfis admin/operador
-2. **Clientes** — CRUD e busca
-3. **Produtos** — CRUD, estoque, preço
-4. **Vendas** — criar venda, itens, baixa de estoque
-5. **Dashboard** — totais do dia/mês, contadores
+- JSON: `../demo-seed/scraped-products.json`
+- Imagens: `../demo-seed/images/products/` (sync para `public/images/products/` no scrape)
+
+## Volumes do seed (`npm run db:seed`)
+
+| Entidade | Qtd |
+|----------|-----|
+| Clientes | 10 |
+| Produtos | 30 |
+| Vendas | ~67 |
+| Contas a receber | 20 |
+| Pagamentos recebidos | ~15 |
+| Despesas | ~23 |
+| Ordens de serviço | 16 |
+| Sessões de caixa | 2 |
+
+## Telas principais
+
+| Rota | Descrição |
+|------|-----------|
+| `/dashboard` | Painel com KPIs |
+| `/vendas/nova` | PDV |
+| `/clientes`, `/produtos`, `/estoque` | Cadastros operacionais |
+| `/caixa`, `/caixa/fechamento` | Caixa |
+| `/financeiro` | Hub financeiro (3 abas) |
+| `/servicos` | Ordens de serviço (kanban) |
+| `/relatorios` | Relatórios e export CSV |
+| `/configuracoes` | Empresa, usuários, integrações |
+
+## Comandos
+
+```bash
+npm run scrape:products
+npm run db:seed
+npm run dev
+npm run build
+npm start
+npm test
+```
 
 ## Documentação
 
-| Documento | Caminho | Propósito |
-|-----------|---------|-----------|
-| PRD | `docs/prd/PRD.md` | O quê e por quê (negócio) |
-| Specs | `docs/specs/` | Requisitos detalhados por módulo |
-| Plans | `docs/plans/` | Como implementar cada módulo |
-| ADRs | `docs/adr/` | Decisões arquiteturais |
+- PRD: `docs/prd/PRD.md`
+- Referências visuais: `docs/references/README.md`
+- Diagramas: `docs/diagrams/architecture.md`
+- ADR stack: `docs/adr/001-stack.md`
+- OpenSpec: `openspec/specs/`
 
-## Regras para a IA
+## Fora de escopo
 
-- Consultar o PRD antes de implementar qualquer funcionalidade
-- Implementar apenas o que está na spec do módulo atual
-- Não adicionar features fora do escopo do MVP (ver PRD seção "Fora do escopo")
-- Seguir `rules/architecture-rules.md` e `rules/backend-rules.md`
-- Separar requisito (spec) de implementação (código)
-
-## Fluxo de trabalho
-
-```
-PRD → Spec → Plan → Implementação → Testes → Review
-```
-
-Nenhuma feature começa diretamente pelo código.
-
-## Convenções de código
-
-- Código em `src/`
-- Testes em `tests/`
-- Mensagens de commit: `feat:`, `docs:`, `test:`, `fix:`, `chore:`
+Upload de imagem pelo usuário, NF-e e WhatsApp real (apenas toggles/mock local).
