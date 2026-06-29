@@ -16,3 +16,4 @@ infra/
 docs/audit/
 docs/visual-audit-compare/
 docs/visual-audit-current/
+scripts/replay-history.py
