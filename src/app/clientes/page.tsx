@@ -1,10 +1,10 @@
-import { AppShell } from "@/components/AppShell";
-import { CustomersPage } from "@/components/CustomersPage";
+import { AppShell } from "@/components/layout/app-shell";
+import { ClientesContent } from "./clientes-content";
 
-export default function Page() {
+export default function ClientesPage() {
   return (
-    <AppShell title="Clientes">
-      <CustomersPage />
+    <AppShell pageTitle="Clientes">
+      <ClientesContent />
     </AppShell>
   );
 }
