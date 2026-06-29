@@ -1,4 +1,4 @@
-# GestãoSimples
+# Gestão Simples
 
 Sistema de gestão para micro e pequenas empresas — Trabalho Final AI Software Engineering.
 
