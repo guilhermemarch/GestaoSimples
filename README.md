@@ -1,6 +1,6 @@
 # Gestão Simples
 
-Sistema de gestão para micro e pequenas empresas — Trabalho Final AI Software Engineering.
+Sistema de gestão para micro e pequenas empresas -> Trabalho Final Tópicos Especiais e Laboratorio de Desenvolvimento.
 
 GestãoSimples centraliza vendas, estoque, caixa, financeiro e ordens de serviço em uma interface única, pensada para o dia a dia de quem opera o negócio sem treinamento complexo.
 
