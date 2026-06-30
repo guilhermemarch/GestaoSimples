@@ -4,7 +4,7 @@ Sistema de gestão para micro e pequenas empresas — Trabalho Final AI Software
 
 GestãoSimples centraliza vendas, estoque, caixa, financeiro e ordens de serviço em uma interface única, pensada para o dia a dia de quem opera o negócio sem treinamento complexo.
 
-**Stack:** Next.js 15 (App Router) · SQLite + Prisma · JWT em cookie · Tailwind CSS 4 · Vitest
+**Stack:** Next.js 15 (App Router) · SQLite + Prisma · JWT em cookie · Tailwind CSS 4 · Vitest.
 
 ---
 
